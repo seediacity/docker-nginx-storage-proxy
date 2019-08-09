@@ -112,7 +112,8 @@ http {
             {{ if eq .Env.NOT_FOUND_MEANS_INDEX "true" }}
             error_page              404 =200 /index.html;
             {{ end }}
-            proxy_pass              {{ template "proxy_protocol" . }}://cloud-storage/{{ .Env.GCS_BUCKET_URL }}$uri;
+            # $uri is appended to proxy pass automatically, starting slash (as in location) is peeled off
+            proxy_pass              {{ template "proxy_protocol" . }}://cloud-storage/{{ .Env.GCS_BUCKET_URL }};
         }
         {{ else if .Env.AZ_STORAGE_ACCOUNT_NAME }}
         location / {
@@ -142,7 +143,8 @@ http {
             {{ if eq .Env.NOT_FOUND_MEANS_INDEX "true" }}
             error_page              404 =200 /index.html;
             {{ end }}
-            proxy_pass              {{ template "proxy_protocol" . }}://cloud-storage/{{ .Env.AZ_STORAGE_BLOB_URL }}$uri;
+            # $uri is appended to proxy pass automatically, starting slash (as in location) is peeled off
+            proxy_pass              {{ template "proxy_protocol" . }}://cloud-storage/{{ .Env.AZ_STORAGE_BLOB_URL }};
         }
         {{ end }}
     }

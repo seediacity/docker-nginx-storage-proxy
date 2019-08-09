@@ -32,7 +32,7 @@ Variable | Description | Default
 --- | --- | ---
 `GCS_BUCKET_URL` | Full URL to the bucket folder. `https://storage.googleapis.com/[GCS_BUCKET_URL]/index.html` | None - either GCS or AZ required
 `AZ_STORAGE_ACCOUNT_NAME` | Name of the storage account. `https://[AZ_STORAGE_ACCOUNT_NAME].blob.core.windows.net/my-bucket/some-other-dir/index.html` | None - either GCS or AZ required
-`AZ_STORAGE_BLOB_URL` | Container name with folder (blob) path. `https://mystorageaccount.blob.core.windows.net/[AZ_STORAGE_BLOB_URL]/index.html` | None - either GCS or AZ required
+`AZ_STORAGE_BLOB_URL` | Container name with folder (blob) path, containing trailing slash. `https://mystorageaccount.blob.core.windows.net/[AZ_STORAGE_BLOB_URL]index.html` | None - either GCS or AZ required
 `LISTEN_PORT` | Server listen port | 8080
 `NOT_FOUND_MEANS_INDEX` | When requested path is not found in the bucket, return index.html. Useful when serving single page apps, like Angular, React, Ember. Possible values: "true", "false". | false
 `PROXY_HTTPS_ENABLED` | Use https to connect with remote storage, if disabled http is used. Possible values: "true", "false". | false
