@@ -59,6 +59,8 @@ http {
            server          'storage.googleapis.com:{{ template "proxy_port" . }}';
        {{ else if .Env.AZ_STORAGE_ACCOUNT_NAME }}
            server          '{{ .Env.AZ_STORAGE_ACCOUNT_NAME }}.blob.core.windows.net:{{ template "proxy_port" . }}';
+       {{ else if .Env.S3_BUCKET_NAME }}
+           server          '{{ .Env.S3_BUCKET_NAME }}.s3.eu-central-1.amazonaws.com:{{ template "proxy_port" . }}'
        {{ end }}
        keepalive       100;
    }
@@ -145,6 +147,35 @@ http {
             {{ end }}
             # $uri is appended to proxy pass automatically, starting slash (as in location) is peeled off
             proxy_pass              {{ template "proxy_protocol" . }}://cloud-storage/{{ .Env.AZ_STORAGE_BLOB_URL }};
+        }
+        {{ else if .Env.S3_BUCKET_NAME }}
+        location / {
+            proxy_set_header        Host {{ .Env.S3_BUCKET_NAME }}.s3.eu-central-1.amazonaws.com
+            proxy_set_header        Cookie "";
+            proxy_set_header        Authorization "";
+            proxy_set_header        Connection "";
+            proxy_hide_header       x-amz-id-2;
+            proxy_hide_header       x-amz-request-id;
+            proxy_hide_header       Set-Cookie;
+            proxy_hide_header       Expires;
+            proxy_hide_header       Cache-Control;
+            proxy_ignore_headers    Set-Cookie;
+            proxy_http_version      1.1;
+            proxy_intercept_errors  on;
+            proxy_method            GET;
+            proxy_pass_request_body off;
+
+            proxy_ignore_headers    Expires Cache-Control;
+            proxy_cache             cloud-storage;
+            proxy_cache_key         "$host/$proxy_host$uri";
+            proxy_cache_valid       200 1d;
+            add_header              X-Cache $upstream_cache_status;
+
+            {{ if eq .Env.NOT_FOUND_MEANS_INDEX "true" }}
+            error_page              404 =200 /index.html;
+            {{ end }}
+            # $uri is appended to proxy pass automatically, starting slash (as in location) is peeled off
+            proxy_pass              {{ template "proxy_protocol" . }}://cloud-storage/{{ .Env.S3_BUCKET_NAME }};
         }
         {{ end }}
     }
